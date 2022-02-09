@@ -1,0 +1,1 @@
+# wg-game-hub-service
