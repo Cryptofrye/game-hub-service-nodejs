@@ -11,8 +11,8 @@
   },
   "license": "UNLICENSED",
   "scripts": {
-    "db:migrate": "dotenv -e ../.env -- npx prisma migrate dev --name init",
-    "db:introspect": "dotenv -- prisma introspect",
+    "db:migrate": "dotenv -e ../.env -- npx prisma migrate dev --name demo_user",
+    "db:introspect": "dotenv -e ../.env -- npx prisma db pull",
     "db:generate": "dotenv -- prisma generate",
     "prebuild": "rimraf dist",
     "build": "nest build",

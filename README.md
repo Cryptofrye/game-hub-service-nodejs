@@ -54,6 +54,7 @@
 
 - [About](#about)
 - [Technical Overview](#technical-overview)
+  - [Dev Lifecycle Steps](#dev-lifecycle-steps)
   - [Command Reference](#command-reference)
 - [Instantiate MySQL Instance for Development Purpose](#instantiate-mysql-instance-for-development-purpose)
 - [Generate Prisma artifacts](#generate-prisma-artifacts)
@@ -76,10 +77,12 @@ The repo infrastcuture relies on docker-compose tool to configure/instantiate da
 
 > Note: Please review and configure ".env" file in advance. The file is crucial for MySQL DB configurations, prisma framework schema generation and your microservice at runtime.  
 
-You will find detailed inforamtion about each step of the development lifecycle. It is briefly described below as a reference point. You need to work in the project root directory.
+You will find detailed inforamtion about each step of the development lifecycle in the following sections. It is briefly described below as a reference point. You need to work in the project root directory.
 
-- Run "docker-compose up" command. It reads ".env" file,  builds the MySQL impage from "db" directory and creates your database user and database instance. You will see console outputs indicating successfull start of MySQL. Keep the terminal open and start a new terminal to continue.
-- If you set up your db for the first time (or you purged your MySQL instance and now you set it up again), you need to give privilages to your MySQL user so that Prisma framework can manuplate your MySql DB. It is one-time task. You do not need to repeat this task each time you run "docker-compose up". 
+### Dev Lifecycle Steps
+
+1. **MySQL setup:** Run "docker-compose up" command. It reads ".env" file,  builds the MySQL impage from "db" directory and creates your database user and database instance. You will see console outputs indicating successfull start of MySQL. Keep the terminal open and start a new terminal to continue.
+2. **MySQL Access Conf:** If you set up your db for the first time (or you purged your MySQL instance and now you set it up again), you need to give privilages to your MySQL user so that Prisma framework can manuplate your MySql DB. It is one-time task. You do not need to repeat this task each time you run "docker-compose up". 
     - Run **"docker ps"** command to find and copy your MySQL container id
     - Start a MySQL client session with root user, run command below, enter your root password
       ```bash 
@@ -91,12 +94,15 @@ You will find detailed inforamtion about each step of the development lifecycle.
       flush privileges;
       ```
     - Terminate the session by running **"exit"** command
-- Once your MySQL DB is up, run **"npm run db:migrate"** command to generate your database schema sql files and create your database instance on the running MySQL instance. You need to complete this step in the initial stage or repeat it whenever you do some changes in **"prisma/schema.prisma"** file. **"npm run db:migrate"** is defined in the package.json file. It eventually executes **"dotenv -e ../.env -- npx prisma migrate dev --name init"** command. If you repeat the schema generation, you need to rename the migration therefore change the parameter prisma\migrations\20220209150351_init with a proper tag, eg "--name user_table_added".
-- Run **"npm start"** in order to bootstrap your microservice. Prisma framework reads the same ".env" file and establish connection to your MySQL user at runtime. See src\service\prisma.service.ts file for further details
-- Query the api **"http://localhost:3000/api/demos"** on your browser.It should return an empty list
-- You can run **"docker-compose down -v"** command to wipe out your MySQL setup and start over.
+3. **Create your database:** Once your MySQL DB is up, run **"npm run db:migrate"** command to generate your database schema sql files and create your database instance on the running MySQL instance. You need to complete this step in the initial stage or repeat it whenever you do some changes in **"prisma/schema.prisma"** file. **"npm run db:migrate"** is defined in the package.json file. It eventually executes **"dotenv -e ../.env -- npx prisma migrate dev --name init"** command. Once the command is executed, you will see generated schema file under **"prisma\migrations\"** folder, eg: prisma\migrations\20220209150351_init.  
+   - **Update your database:** If you add a new entity or change something in **"prisma/schema.prisma"** file, you need to run db migration again to apply your changes to your running DB instance and generate prisma client artifacts again. You need to rename the migration name in "package.json" file therefore change the parameter value "--name init" with a proper tag, eg "--name user_table_added" in the command **"dotenv -e ../.env -- npx prisma migrate dev --name init"**. 
+4. **Start your microservice:** Run **"npm start"** in order to bootstrap your microservice. Prisma framework reads the same ".env" file and establish connection to your MySQL user at runtime. See src\service\prisma.service.ts file for further details
+5. **Query the api** **"http://localhost:3000/api/demos"** on your browser.It should return an empty list
+6. **Clean up:** Optional: You can run **"docker-compose down -v"** command to wipe out your MySQL setup and start over. It does full clean up. If you want to stop your MySQL instance, just hit "ctrl+C" on the mysql terminal.
 
-> Note: When you shut down your MySQL instance, your confs and database instance remains intact. You can run "docker-compose up" again and continue working
+> Note: When you shut down your MySQL instance(ctrl+C), your confs and database instance remains intact. You can run "docker-compose up" again and continue working
+
+> Note: One you migrate your db and generate prisma client files, your IDE might not recognize the new prisma client because of dependency file cache in the IDE itself. Try to refresh your project and run "npm install" to refresh your dependency tree. You should see your database entity objects in "node_modules\\.prisma\client\index.d.ts" file 
 
 ### Command Reference
 
@@ -253,7 +259,7 @@ To be able to add internal wodo module as npm dependency, you need to authentica
 If GitHub Packages is not your default package registry for using npm and you want to use the npm audit command, we recommend you use the --scope flag with the owner of the package when you authenticate to GitHub Packages.
 
 ```bash
-$ npm login --scope=@wodo-platform --registry=https://npm.pkg.github.com --u your_git_user --p your_token 
+npm login --scope=@wodo-platform --registry=https://npm.pkg.github.com
 ```
 
 Once you login successfully, you can run "npm install" command and start to develop your features. 
@@ -304,7 +310,7 @@ Open the url "http://localhost:8080/api/demos" and "http://localhost:8080/docs" 
 
 ## Publish The Module as NPM Package Locally
 
-You may need to publish npm packages from your local dev env in order to speed up development process. It is sort of workaround and you should do clean-up your published package versions since our ffficial github actions will take care of package publishing eventually.
+You may need to publish npm packages from your local dev env in order to speed up development process. It is sort of workaround and you should do clean-up your published package versions since our official github actions will take care of package publishing eventually.
 
 Please follow the steps below to publish wodo-nodejs-persistance npm package from your local development environment.
 
