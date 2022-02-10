@@ -102,7 +102,7 @@ You will find detailed inforamtion about each step of the development lifecycle 
 
 > Note: When you shut down your MySQL instance(ctrl+C), your confs and database instance remains intact. You can run "docker-compose up" again and continue working
 
-> Note: One you migrate your db and generate prisma client files, your IDE might not recognize the new prisma client because of dependency file cache in the IDE itself. Try to refresh your project and run "npm install" to refresh your dependency tree. You should see your database entity objects in "node_modules\\.prisma\client\index.d.ts" file 
+> Note: Once you migrate your db and generate prisma client files, your IDE might not recognize the new prisma client because of dependency file cache in the IDE itself. Try to refresh your project and run "npm install" to refresh your dependency tree. You should see your database entity objects in "node_modules\\.prisma\client\index.d.ts" file 
 
 ### Command Reference
 
