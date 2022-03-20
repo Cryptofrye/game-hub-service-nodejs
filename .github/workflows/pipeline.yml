@@ -1,7 +1,6 @@
 name: Build and Publish
 
 on:
-  # TODO: re-design the flow as we may night be build docker images for each commit
   #schedule:
   #  - cron: $cron-daily
   push:
@@ -32,17 +31,14 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      #- Till we add some build time test, the step below is disabled
-      #- name: Install dependencies
-      #  run: |
-      #    echo "@wodo-platform:registry=https://npm.pkg.github.com/" > .npmrc
-      #    echo "registry=https://registry.npmjs.org/" >> .npmrc
-      #    echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN}" >> .npmrc
-      #    npm install
-      #    rm -f .npmrc
-      #  env:
-      #    NPM_TOKEN: ${{ secrets.WODO_TOKEN }}
-      
+      - name: Install dependencies
+        run: |
+          echo "@wodo-platform:registry=https://npm.pkg.github.com/" > .npmrc
+          echo "//npm.pkg.github.com/:_authToken=$NPM_TOKEN" >> .npmrc
+          npm install
+          rm -f .npmrc
+        env:
+          NPM_TOKEN: ${{ secrets.WODO_TOKEN }}
       #- run: npm test 
        
       # Login against a Docker registry except

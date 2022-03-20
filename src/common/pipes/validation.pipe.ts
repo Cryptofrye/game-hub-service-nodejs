@@ -1,8 +1,10 @@
 import { PipeTransform, ArgumentMetadata, BadRequestException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { plainToClass } from 'class-transformer';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
-import {ajv, VALIDATION_SCHEMA_DEMO_CREATE, VALIDATION_SCHEMA_DEMO_UPDATE} from "./validation"
+import {ajv, VALIDATION_SCHEMA_GAME_LOUNGE_CREATE, VALIDATION_SCHEMA_GAME_LOUNGE_UPDATE} from "./validation"
 import { DefinedError, JSONSchemaType } from 'ajv';
 import { WG_ERROR_INTERNAL_SERVER, WG_ERROR_GL_CREATE_VALIDATION, WGErrorCode, WG_ERROR_GL_UPDATE } from '@wodo-platform/wg-shared-lib/dist/wodogaming/error/error.codes';
+import { WGError } from '@wodo-platform/wg-shared-lib/dist/wodogaming/error/wg.error';
 import { WGExceptionMessage } from '@wodo-platform/wg-shared-lib/dist/wodogaming/error/wg.exception.message';
 
 
@@ -20,11 +22,11 @@ export class ValidationPipe implements PipeTransform<any> {
   async transform(value, metadata: ArgumentMetadata) {
 
     let wgErrorCode:WGErrorCode;
-    if(this.validationSchema && this.validationSchema === VALIDATION_SCHEMA_DEMO_CREATE) {
-      wgErrorCode = WG_ERROR_GL_CREATE_VALIDATION; // indeed this is demo error code..but no need to create it in our erro catalog
+    if(this.validationSchema && this.validationSchema === VALIDATION_SCHEMA_GAME_LOUNGE_CREATE) {
+      wgErrorCode = WG_ERROR_GL_CREATE_VALIDATION;
     }
-    else if(this.validationSchema && this.validationSchema === VALIDATION_SCHEMA_DEMO_UPDATE) {
-      wgErrorCode = WG_ERROR_GL_UPDATE; 
+    else if(this.validationSchema && this.validationSchema === VALIDATION_SCHEMA_GAME_LOUNGE_UPDATE) {
+      wgErrorCode = WG_ERROR_GL_UPDATE;
     }
     else{
       wgErrorCode = WG_ERROR_INTERNAL_SERVER;

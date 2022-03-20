@@ -1,14 +1,14 @@
 import Ajv from "ajv";
 import Ajv2019 from "ajv/dist/2019"
-import {demoCreateValidationSchema} from "../../dto/demo/demo.create.dto.schema";
-import {demoUpdateValidationSchema} from "../../dto/demo/demo.update.dto.schema";
+import { gameLoungeCreateValidationSchema } from "src/game-lounge/dtos/game-lounge-create.dto.schema";
+import { gameLoungeUpdateValidationSchema } from "src/game-lounge/dtos/game-lounge-update.dto.schema";
 
 export const ajv = new Ajv2019();
 
-export const VALIDATION_SCHEMA_DEMO_CREATE = "validation.schema.demo.create";
-export const VALIDATION_SCHEMA_DEMO_UPDATE = "validation.schema.demo.update";
+export const VALIDATION_SCHEMA_GAME_LOUNGE_CREATE = "validation.schema.game.lounge.create";
+export const VALIDATION_SCHEMA_GAME_LOUNGE_UPDATE = "validation.schema.game.lounge.update";
 
-ajv.addSchema(demoCreateValidationSchema, VALIDATION_SCHEMA_DEMO_CREATE);
-ajv.addSchema(demoUpdateValidationSchema, VALIDATION_SCHEMA_DEMO_UPDATE);
+ajv.addSchema(gameLoungeCreateValidationSchema, VALIDATION_SCHEMA_GAME_LOUNGE_CREATE);
+ajv.addSchema(gameLoungeUpdateValidationSchema, VALIDATION_SCHEMA_GAME_LOUNGE_UPDATE);
 
 

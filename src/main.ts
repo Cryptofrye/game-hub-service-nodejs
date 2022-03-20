@@ -1,15 +1,16 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { ApplicationModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
-  const appOptions = {cors: true};
-  const app = await NestFactory.create(AppModule, appOptions);
-  //app.setGlobalPrefix('api');
+  const appOptions = {cors: true, bufferLogs: true};
+  const app = await NestFactory.create(ApplicationModule, appOptions);
+  app.useLogger(app.get(Logger));
 
   const options = new DocumentBuilder()
-    .setTitle('Demo Service API')
-    .setDescription('Demo Service API empowers developers to speed up their development process by providing the nodejs service template with prisma and nest frameworks')
+    .setTitle('Wodo Game Lounge API')
+    .setDescription('Wodo Game Lounge microservice in order to handle business logic for game lounge and game server relaated cases.')
     .setVersion('1.0')
     .setBasePath('api')
     .addBearerAuth()

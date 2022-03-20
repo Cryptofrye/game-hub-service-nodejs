@@ -21,7 +21,7 @@ services:
   #    - mysqldb
   #  build: ./
   #  restart: unless-stopped
-  #  env_file: ./.env
+  #  env_file: ./prisma/.env
   #  ports:
   #    - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
   #  environment:

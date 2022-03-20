@@ -5,17 +5,14 @@ ARG NPM_TOKEN
 WORKDIR /usr/src/app
 
 COPY package*.json ./
-COPY prisma ./
-COPY .env ./
 
 RUN echo "@wodo-platform:registry=https://npm.pkg.github.com/" > .npmrc 
-RUN echo "registry=https://registry.npmjs.org/" >> .npmrc 
 RUN echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN}" >> .npmrc && \
     npm install  && \
     rm -f .npmrc
 
-RUN npm run db:generate
 COPY . .
+
 RUN npm run build
 
 
@@ -28,7 +25,8 @@ ENV NODE_ENV=${NODE_ENV}
 WORKDIR /usr/src/app
 
 COPY package*.json ./
-COPY .env ./
+
+COPY . .
 
 # TODO: find a better way to bundle dependencies with nestjs. 
 COPY --from=development /usr/src/app/node_modules ./node_modules
