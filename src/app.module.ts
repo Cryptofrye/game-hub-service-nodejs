@@ -10,7 +10,7 @@ import { GameLoungeModule } from './game-lounge/game-lounge.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ErrorsInterceptor } from '@wodo-platform/wg-shared-lib/dist/wodogaming/error/errors.interceptor';
 import { LoggerModule } from 'nestjs-pino';
-import { GameLoungeEntity } from './game-lounge/entities/game-lounge.orm.entity';
+import { WalletModule } from './wallet/wallet.module';
 
 @Module({
   imports: [
@@ -52,6 +52,7 @@ import { GameLoungeEntity } from './game-lounge/entities/game-lounge.orm.entity'
    // NotificationModule,
     //GameServerModule,
     GameLoungeModule,
+    WalletModule,
     RouterModule.register([ 
      /* {
         path: 'api',
@@ -61,6 +62,10 @@ import { GameLoungeEntity } from './game-lounge/entities/game-lounge.orm.entity'
         path: 'api',
         module: GameLoungeModule
       } as RouteTree,
+      {
+        path: 'api',
+        module: WalletModule
+      } as RouteTree
       ,
       /* {
         path: 'api',

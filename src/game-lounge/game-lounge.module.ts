@@ -2,14 +2,18 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { GameLoungeStateController } from './controllers/game-launge-state.controller';
 import { GameLoungeTypeController } from './controllers/game-launge-type.controller';
 import { GameLoungeController } from './controllers/game-lounge.controller';
-import { GameLoungeEntity } from './entities/game-lounge.orm.entity';
+import { GameLoungeEntity } from './entities/game-lounge.entity';
 import { GameLoungeService } from './services/game-lounge.service';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { WalletModule } from 'src/wallet/wallet.module';
+import { AccountEntity } from 'src/wallet/entities/account.entity';
+import { GameLoungeUserEntity } from './entities/game-lounge-user.entity';
 
 
 @Module({
   imports: [ 
-    SequelizeModule.forFeature([GameLoungeEntity])
+    SequelizeModule.forFeature([GameLoungeEntity, GameLoungeUserEntity, AccountEntity]),
+    WalletModule
   ],
   providers: [
     GameLoungeService

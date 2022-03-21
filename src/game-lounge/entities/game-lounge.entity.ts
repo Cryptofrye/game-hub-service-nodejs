@@ -18,6 +18,7 @@ export interface UpdateGameLoungeProps extends CreateGameLoungeProps {
 }
 
 export interface GameLoungeProps extends UpdateGameLoungeProps {
+    id:number;
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date;

@@ -15,5 +15,6 @@ export class GameLoungeDto {
     prize!: number;
     duration!: number;
     deleted!: boolean;
-
+    createdAt!: Date;
+    updatedAt!: Date;
 }

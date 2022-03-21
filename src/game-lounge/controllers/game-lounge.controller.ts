@@ -5,9 +5,12 @@ import { VALIDATION_SCHEMA_GAME_LOUNGE_CREATE, VALIDATION_SCHEMA_GAME_LOUNGE_UPD
 import { GameLoungeService } from '../services/game-lounge.service';
 import { ValidationPipe } from '../../common/pipes/validation.pipe';
 import {GameLoungeCreateDto} from '../dtos/game-lounge-create.dto';
-import { GameLoungeEntity } from '../entities/game-lounge.orm.entity';
+import { GameLoungeEntity } from '../entities/game-lounge.entity';
 import { GameLoungeDto } from '../dtos/game-lounge.dto';
 import { GLDtoMapper } from '../utils/game-lounge.dto.mapper';
+import { GameLoungeUserAddDto } from '../dtos/game-lounge-user-add.dto';
+import { GameLoungeUserEntity } from '../entities/game-lounge-user.entity';
+import { GameLoungeUserDto } from '../dtos/game-lounge-user.dto';
 
 @ApiBearerAuth()
 @ApiTags('game-lounges')
@@ -15,6 +18,24 @@ import { GLDtoMapper } from '../utils/game-lounge.dto.mapper';
 export class GameLoungeController { 
 
   constructor(private readonly gameLoungeService: GameLoungeService) {}
+
+  @ApiOperation({ summary: 'Add player to a gaming lounge' })
+  @ApiResponse({ status: 201, description: 'The palyer has been successfully added to the game lounge.' })
+  @ApiResponse({ status: 400, description: 'Invalid input.' })
+  @Post(':id/players/')
+  async addUser(@Param('id', ParseIntPipe) id: number,@Body() gameLoungeUserAddDto: GameLoungeUserAddDto) : Promise<GameLoungeUserDto> {
+    let glUserEntity:GameLoungeUserEntity = await this.gameLoungeService.addPlayer({gameLoungeId:id, ...gameLoungeUserAddDto});
+    return GLDtoMapper.toGameLoungeUserDto(glUserEntity);
+  }
+
+  @ApiOperation({ summary: 'Find all players in a given game lounge by id' })
+  @ApiResponse({ status: 200, description: 'Return all players joned the given game lounge.'})
+  @Get(':id/players')
+  async findAllGameLoungePlayers(@Param('id', ParseIntPipe) id: number,): Promise<GameLoungeUserDto[]> {
+    let gls:GameLoungeUserEntity[] = await this.gameLoungeService.findAllGlPlayers(id);
+    let glUDtos:GameLoungeUserDto[] = GLDtoMapper.toGameLoungeUserDtos(gls)
+    return glUDtos;
+  }
 
   @ApiOperation({ summary: 'Create gaming lounge' })
   @ApiResponse({ status: 201, description: 'The gaming lounge has been successfully created.' })
