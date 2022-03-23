@@ -8,45 +8,95 @@ import { GameLoungeType, GAME_LOUNGE_TYPE_LIST } from "../../common/constants/ga
 import { CreateGameLoungeUserProps, GameLoungeUserEntity } from "../entities/game-lounge-user.entity";
 import { AccountEntity } from "src/wallet/entities/account.entity";
 import { AccountService } from "src/wallet/services/account.service";
+import { GameLoungeRepo } from "../repos/game-lounge.repo";
+import { EventEmitter2 } from "@nestjs/event-emitter";
+import { WithdrawAssetInitiatedEvent, WithdrawAssetPayload } from "src/common/events/events";
 
-
+/**
+ * Service implementation for business logic. 
+ */
 @Injectable()
 export class GameLoungeService {
 
   private readonly logger = new Logger(GameLoungeService.name);
 
   constructor(
+    private readonly gameLoungeRepo:GameLoungeRepo,
     @InjectModel(GameLoungeEntity)
-    private readonly gameLoungeRepo: typeof GameLoungeEntity,
+    private readonly gameLoungeEntity: typeof GameLoungeEntity,
     @InjectModel(GameLoungeUserEntity)
-    private readonly gameLoungeUserRepo: typeof GameLoungeUserEntity,
-    @InjectModel(AccountEntity)
-    private readonly accountRepo: typeof AccountEntity,
+    private readonly gameLoungeUserEntity: typeof GameLoungeUserEntity,
     private readonly accountService: AccountService,
-    private sequelize: Sequelize) {
+    private sequelize: Sequelize,
+    private eventEmmitter:EventEmitter2) {
 
     this.logger.debug(`instantiated a new instance of ${GameLoungeService.name}`);
   }
 
+  
+  async addPlayer(glUserCreateProps: CreateGameLoungeUserProps): Promise<GameLoungeUserEntity> {
+    
+    let userId:number = glUserCreateProps.userId;
+    let gameLoungeId:number = glUserCreateProps.gameLoungeId;
+
+    let gameLounge: GameLoungeEntity = await this.findById(gameLoungeId);
+
+    let glUSer!:GameLoungeUserEntity;
+
+    // Till we have event driven architectire this needs to happen in the same DB transaction
+    // debit functionality will be done via async message functionality at later phases
+    // Three steps:
+    //   1- Withdraw the amount
+    //   2- create auidit log for the account
+    //   3- let the user in the game lounge (create gameLoungeUser record in DB )
+    try {
+      await this.sequelize.transaction(async t => {
+        const transactionHost = { transaction: t };
+
+        let debitEvent: WithdrawAssetInitiatedEvent = new WithdrawAssetInitiatedEvent(); 
+        debitEvent.payload = {
+            userId:userId,
+            accountId: null,
+            assetId:gameLounge.assetId,
+            fee: gameLounge.fee, 
+            t:t
+          };
+
+        let result:any[] = await this.eventEmmitter.emitAsync(WithdrawAssetInitiatedEvent.toEventId(),debitEvent);
+
+        if(result && result[0]) {
+          this.logger.debug(`Withdraw event has been processed successfully.`);
+        }
+
+        //account = await  this.accountService.debitAsset(account, gameLounge.fee, transactionHost.transaction );
+        glUSer = await this.gameLoungeUserEntity.create({...glUserCreateProps},
+            transactionHost
+        );
+      });
+    } catch (err) {
+      this.logger.error(`Could not add user:${userId} to game lounge:${gameLoungeId}. error:${err}`);
+      throw new Error(`Could not add user:${userId} to game lounge:${gameLoungeId}`);
+    }
+
+    return glUSer;
+
+  }
+
+  // standard CRUD functions
+
   async create(gameLounge: CreateGameLoungeProps): Promise<GameLoungeEntity> {
 
     this.logger.debug("creating game lounge:" + JSON.stringify(gameLounge));
-    let gl:GameLoungeEntity = await this.gameLoungeRepo.create<GameLoungeEntity>({...gameLounge});
+    let gl:GameLoungeEntity = await this.gameLoungeRepo.create(gameLounge);
     
-    return gl.get({plain:true});
+    return gl;
   }
 
   async update(id:number,gameLounge: UpdateGameLoungeProps): Promise<GameLoungeEntity> {
 
     this.logger.debug("updating game lounge:" + JSON.stringify(gameLounge));
-    let result = await this.gameLoungeRepo.update<GameLoungeEntity>({...gameLounge}, { where: { id } });
-
-    if(result[0]> 0) {
-      return new GameLoungeEntity({id: id, ...gameLounge});
-    }
-    else{
-      throw new Error(`Game Lounge could not be found by id:${id}. No record updated`);
-    }
+    let gle:GameLoungeEntity = await this.gameLoungeRepo.update(id,gameLounge);
+    return gle;
   }
 
   /**
@@ -57,7 +107,7 @@ export class GameLoungeService {
    * @returns array of GamingLounge entities
    */
   async findAll(id: number | null, name: string | null): Promise<GameLoungeEntity[]> {
-    let gamingLounges: GameLoungeEntity[] = await this.gameLoungeRepo.findAll<GameLoungeEntity>();
+    let gamingLounges: GameLoungeEntity[] = await this.gameLoungeRepo.findAll(id,name);
     return gamingLounges;
   }
 
@@ -69,17 +119,7 @@ export class GameLoungeService {
    */
   async findById(id: number): Promise<GameLoungeEntity> {
     // TODO: validate method params
-    this.logger.debug(`finding demo in the datastore by id[${id}]`);
-    let gameLounge: GameLoungeEntity | null = await this.gameLoungeRepo.findByPk<GameLoungeEntity>(id);
-
-    if (gameLounge) {
-      this.logger.debug(`found demo[${JSON.stringify(gameLounge)}] in the datastore by id[${id}]`);
-    }
-    else {
-      this.logger.debug(`could not find any game lounge record in the datastore by id[${id}]`);
-      throw new Error(`Game Lounge could not be found by id:${id}`);
-    }
-
+    let gameLounge: GameLoungeEntity = await this.gameLoungeRepo.findById(id);
     return gameLounge;
   }
 
@@ -116,45 +156,8 @@ export class GameLoungeService {
     return GAME_LOUNGE_STATE_LIST;
   }
 
-  async addPlayer(glUserCreateProps: CreateGameLoungeUserProps): Promise<GameLoungeUserEntity> {
-    
-    let userId:number = glUserCreateProps.userId;
-    let gameLoungeId:number = glUserCreateProps.gameLoungeId;
-
-    let account: AccountEntity = await this.accountService.findByUserId(userId);
-    let gameLounge: GameLoungeEntity = await this.findById(gameLoungeId);
-
-    if(account.balance < gameLounge.fee) {
-      throw new Error(`Insufficient balance ${account.balance} for user ${userId} to join game lounge ${gameLoungeId}`);
-    }
-
-    let glUSer!:GameLoungeUserEntity;
-
-    // this needs to happen in the same DB transaction
-    try {
-      await this.sequelize.transaction(async t => {
-        const transactionHost = { transaction: t };
-  
-        account.balance = (account.balance - gameLounge.fee);
-
-        account = await account.update({balance:account.balance},transactionHost);
-        
-        glUSer = await this.gameLoungeUserRepo.create({...glUserCreateProps},
-            transactionHost
-        );
-        
-      });
-    } catch (err) {
-      this.logger.error(`Could not add user:${userId} to game lounge:${gameLoungeId}. error:${err}`);
-      throw new Error(`Could not add user:${userId} to game lounge:${gameLoungeId}`);
-    }
-
-    return glUSer;
-
-  }
-
   async findAllGlPlayers(gameLoungeId: number): Promise<GameLoungeUserEntity[]> {
-    let glPlayers: GameLoungeUserEntity[] = await this.gameLoungeUserRepo.findAll<GameLoungeUserEntity>({where: {gameLoungeId}});
+    let glPlayers: GameLoungeUserEntity[] = await this.gameLoungeRepo.findAllGlPlayers(gameLoungeId);
     return glPlayers;
   }
 

@@ -8,6 +8,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { WalletModule } from 'src/wallet/wallet.module';
 import { AccountEntity } from 'src/wallet/entities/account.entity';
 import { GameLoungeUserEntity } from './entities/game-lounge-user.entity';
+import { GameLoungeRepo } from './repos/game-lounge.repo';
 
 
 @Module({
@@ -16,6 +17,7 @@ import { GameLoungeUserEntity } from './entities/game-lounge-user.entity';
     WalletModule
   ],
   providers: [
+    GameLoungeRepo,
     GameLoungeService
   ],
   controllers: [
