@@ -22,9 +22,9 @@ export class AccountService {
   }
 
   @OnEvent(`${WithdrawAssetInitiatedEvent.toEventId()}`)
-  async handleDebitInitiatedEvent(withdrawEvent: WithdrawAssetInitiatedEvent) {
+  async handleWithdrawAssetEvent(withdrawEvent: WithdrawAssetInitiatedEvent) {
     this.logger.debug(`received event:${withdrawEvent}`)
-    let account: AccountEntity =  await  this.withDrawAsset(withdrawEvent.payload.userId,withdrawEvent.payload.assetId , withdrawEvent.payload.fee, withdrawEvent.payload.t );
+    let account: AccountEntity =  await  this.withdrawAsset(withdrawEvent.payload.userId,withdrawEvent.payload.assetId , withdrawEvent.payload.fee, withdrawEvent.payload.t );
     return account;
   }
 
@@ -38,7 +38,7 @@ export class AccountService {
   * @param t 
   * @returns AccountEntity
   */
-  async withDrawAsset(userId: number, assetId: number,fee:number, t:Transaction | null): Promise<AccountEntity> {
+  async withdrawAsset(userId: number, assetId: number,fee:number, t:Transaction | null): Promise<AccountEntity> {
 
         let account: AccountEntity = await this.findByUserIdAssetId(userId, assetId);
 

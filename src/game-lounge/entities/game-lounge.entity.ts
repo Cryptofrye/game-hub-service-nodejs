@@ -2,6 +2,7 @@ import { Column, Model, NotNull, Table } from 'sequelize-typescript';
 
 
 export interface CreateGameLoungeProps {
+    uuid?: string;
     type: number;
     state: number;
     gameId: number;

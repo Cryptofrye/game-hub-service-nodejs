@@ -2,11 +2,16 @@ import { NestFactory } from '@nestjs/core';
 import { ApplicationModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { Logger } from 'nestjs-pino';
+import { INestApplication } from '@nestjs/common';
+
+ 
+export var app:INestApplication;
 
 async function bootstrap() {
   const appOptions = {cors: true, bufferLogs: true};
-  const app = await NestFactory.create(ApplicationModule, appOptions);
+  app = await NestFactory.create(ApplicationModule, appOptions);
   app.useLogger(app.get(Logger));
+  app.enableShutdownHooks();
 
   const options = new DocumentBuilder()
     .setTitle('Wodo Game Lounge API')
@@ -18,6 +23,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('/docs', app, document);
 
-  await app.listen(3000);
+  await app.listen(3002);
 }
 bootstrap();

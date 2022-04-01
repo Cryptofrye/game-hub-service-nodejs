@@ -62,11 +62,11 @@ export class GameLoungeService {
             t:t
           };
 
-        let result:any[] = await this.eventEmmitter.emitAsync(WithdrawAssetInitiatedEvent.toEventId(),debitEvent);
+       // let result:any[] = await this.eventEmmitter.emitAsync(WithdrawAssetInitiatedEvent.toEventId(),debitEvent);
 
-        if(result && result[0]) {
-          this.logger.debug(`Withdraw event has been processed successfully.`);
-        }
+       // if(result && result[0]) {
+       //   this.logger.debug(`Withdraw event has been processed successfully.`);
+       // }
 
         //account = await  this.accountService.debitAsset(account, gameLounge.fee, transactionHost.transaction );
         glUSer = await this.gameLoungeUserEntity.create({...glUserCreateProps},
