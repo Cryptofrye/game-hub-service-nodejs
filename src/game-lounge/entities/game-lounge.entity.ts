@@ -1,8 +1,9 @@
-import { Column, Model, NotNull, Table } from 'sequelize-typescript';
+import { Column, Model, NotNull, PrimaryKey, Table } from 'sequelize-typescript';
+import { STRING} from 'sequelize/types';
 
 
 export interface CreateGameLoungeProps {
-    uuid?: string;
+    uid?: string;
     type: number;
     state: number;
     gameId: number;
@@ -19,14 +20,17 @@ export interface UpdateGameLoungeProps extends CreateGameLoungeProps {
 }
 
 export interface GameLoungeProps extends UpdateGameLoungeProps {
-    id:number;
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date;
 }
 
-@Table({ tableName: "GAME_LOUNGE", version: true, timestamps: true, paranoid:true ,deletedAt: true, omitNull: true })
+@Table({ tableName: "GAME_LOUNGE", version: true, timestamps: true, paranoid:true ,deletedAt: true, omitNull: true,  })
 export class GameLoungeEntity extends Model {
+
+    @PrimaryKey
+    @Column({allowNull:false})
+    uid!: string;
 
     @Column({allowNull:false})
     type!: number;

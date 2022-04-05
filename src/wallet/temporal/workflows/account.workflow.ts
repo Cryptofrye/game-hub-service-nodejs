@@ -10,6 +10,6 @@ const { createAccount, getAccounts, findById } = wf.proxyActivities<ReturnType<t
 export async function createAccountFlow(account: CreateAccountProps): Promise<AccountEntity[]> {
   console.log(`running wokflow createAccount with params:${JSON.stringify(account)}`);
   await createAccount(account);
-  await findById(1);
+  //await findById("1");
   return await getAccounts();
 } 

@@ -49,7 +49,7 @@ describe("GameLoungeController", () => {
             let result:GameLoungeDto | null = await gameLoungeController.create(glDto);
 
             expect(result);
-            expect(result.id).toBe(gl.id);
+            expect(result.uid).toBe(gl.uid);
             expect(result.deleted).toBe(gl.deleted);
             expect(result.duration).toBe(gl.duration);
             expect(result.fee).toBe(gl.fee);
@@ -67,10 +67,10 @@ describe("GameLoungeController", () => {
 
             prismaService.gamingLounge.update.mockResolvedValue(glUpdated);
 
-            let result:GameLoungeDto | null = await gameLoungeController.update(1,glUpdateDto);
+            let result:GameLoungeDto | null = await gameLoungeController.update("1",glUpdateDto);
 
             expect(result);
-            expect(result.id).toBe(glUpdated.id);
+            expect(result.uid).toBe(glUpdated.uid);
             expect(result.deleted).toBe(glUpdated.deleted);
             expect(result.duration).toBe(glUpdated.duration);
             expect(result.fee).toBe(glUpdated.fee);
@@ -84,17 +84,17 @@ describe("GameLoungeController", () => {
     });
 
     describe('findById', () => {
-        it('should return a gaming lounge found by id', async () => {
+        it('should return a gaming lounge found by uid', async () => {
 
             prismaService.gamingLounge.findUnique.mockResolvedValue(gl);
 
-            let result:GameLoungeDto | null = await gameLoungeController.findById(1);
+            let result:GameLoungeDto | null = await gameLoungeController.findById("1");
 
             if(result === null) {
                 expect(result);
             }
             else{
-                expect(result.id).toBe(gl.id);
+                expect(result.uid).toBe(gl.uid);
                 expect(result.deleted).toBe(gl.deleted);
                 expect(result.duration).toBe(gl.duration);
                 expect(result.fee).toBe(gl.fee);
@@ -137,7 +137,7 @@ const glUpdateDto: GameLoungeUpdateDto = {
 };
 
 const glUpdated: GameLoungeProps = {
-    id:1,
+    uid:"1",
     type: GAMING_LOUNGE_TYPE_STANDARD.id,
     state: GAMING_LOUNGE_STATE_INITIALIZED.id,
     gameId: GAMES_SNAKE.id,
@@ -153,7 +153,7 @@ const glUpdated: GameLoungeProps = {
 };
 
 const gl: GameLoungeProps = {
-    id:1,
+    uid:"1",
     type: GAMING_LOUNGE_TYPE_STANDARD.id,
     state: GAMING_LOUNGE_STATE_INITIALIZED.id,
     gameId: GAMES_SNAKE.id,

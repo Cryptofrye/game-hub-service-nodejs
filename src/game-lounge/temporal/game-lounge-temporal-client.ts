@@ -36,12 +36,12 @@ export class GameLoungeTemporalClient implements OnApplicationShutdown {
 
   async run(gameLounge: CreateGameLoungeProps):Promise<string> {
 
-    let uid:string = gameLounge.uuid ? gameLounge.uuid : uuid();
+    gameLounge.uid = gameLounge.uid ? gameLounge.uid : uuid();
     const handle = await this.client.start("gameLoungeFlow", {
       args: [gameLounge], // type inference works! args: [name: string]
       taskQueue: GAME_LOUNGE_QUEUE,
-      // in practice, use a meaningful business id, eg customerId or transactionId
-      workflowId: `${uid}`,
+      // in practice, use a meaningful business uid, eg customerId or transactionId
+      workflowId: `${gameLounge.uid}`,
     });
     console.log(`Started game lounge workflow ${handle.workflowId}`);
   
@@ -53,12 +53,12 @@ export class GameLoungeTemporalClient implements OnApplicationShutdown {
 
   async runAddUserFlow(gameLoungeUser: CreateGameLoungeUserProps):Promise<GameLoungeUserEntity> {
 
-    let uid:string = String(gameLoungeUser.gameLoungeId + "-" + gameLoungeUser.userId);
+    gameLoungeUser.uid = String(gameLoungeUser.gameLoungeId + "-" + gameLoungeUser.userId);
     const handle = await this.client.start("addUserFlow", {
       args: [gameLoungeUser], // type inference works! args: [name: string]
       taskQueue: GAME_LOUNGE_USER_QUEUE,
-      // in practice, use a meaningful business id, eg customerId or transactionId
-      workflowId: `${uid}`,
+      // in practice, use a meaningful business uid, eg customerId or transactionId
+      workflowId: `${gameLoungeUser.uid}`,
     });
     console.log(`Started add user workflow ${handle.workflowId}`);
   

@@ -16,11 +16,14 @@ import { TemporalController } from './controllers/temporal.controller';
 import { GameLoungeUserWorker } from './temporal/game-lounge-user.worker';
 import { GameLoungeActivityProvider } from './temporal/activities/game-lounge.activity.provider';
 import { GameLoungeUserActivityProvider } from './temporal/activities/game-lounge-user.activity.provider';
+import { AccountService } from 'src/wallet/services/account.service';
 
 
 @Module({
   imports: [ 
-    SequelizeModule.forFeature([GameLoungeEntity, GameLoungeUserEntity, AccountEntity]),
+    SequelizeModule.forFeature(
+      [GameLoungeEntity, GameLoungeUserEntity, AccountEntity],
+      ),
     WalletModule
     //forwardRef(() => NanoApiModule),
   ],
@@ -32,7 +35,8 @@ import { GameLoungeUserActivityProvider } from './temporal/activities/game-loung
     GameLoungeService,
     WorkerConfigFactory,
     GameLoungeWorker,
-    GameLoungeUserWorker
+    GameLoungeUserWorker,
+    AccountService
   ],
   controllers: [
     GameLoungeController,

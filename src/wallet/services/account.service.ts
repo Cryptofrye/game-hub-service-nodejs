@@ -5,8 +5,9 @@ import { Transaction } from "sequelize";
 import { AccountEntity, CreateAccountProps, UpdateAccountProps } from "../entities/account.entity";
 import { OnEvent } from '@nestjs/event-emitter';
 import { WithdrawAssetInitiatedEvent } from "src/common/events/events";
-import { HOME_BANANO_ACCOUNT_ID, HOME_NANO_ACCOUNT_ID, HOME_XWGT_ACCOUNT_ID } from "../utils/account.contants";
+import { HOME_BANANO_ACCOUNT_ID, HOME_BANANO_ACCOUNT_NAME, HOME_NANO_ACCOUNT_ID, HOME_NANO_ACCOUNT_NAME, HOME_XWGT_ACCOUNT_ID, HOME_XWGT_ACCOUNT_NAME } from "../utils/account.contants";
 import { ASSET_BANANO, ASSET_NANO, ASSET_XWGT } from "src/common/constants/asset";
+import { v4 as uuid } from 'uuid';
 
 
 @Injectable()
@@ -43,7 +44,7 @@ export class AccountService {
         let account: AccountEntity = await this.findByUserIdAssetId(userId, assetId);
 
         if(account.balance < fee) {
-          throw new Error(`Insufficient balance ${account.balance} on account: ${account.id} for user:${userId} to withdraw: ${fee}`);
+          throw new Error(`Insufficient balance ${account.balance} on account: ${account.uid} for user:${userId} to withdraw: ${fee}`);
         }
 
         let homeXWGETAccount: AccountEntity = await this.getXWGTHomeAccount();
@@ -64,20 +65,20 @@ export class AccountService {
       case ASSET_BANANO.id:
           return await this.getBananoHomeAccount();     
       default:
-          throw Error(`asset not found by id:${assetId}`);
+          throw Error(`asset not found by uid:${assetId}`);
     }
   }
 
   async getXWGTHomeAccount(): Promise<AccountEntity> {
-    return this.findById(HOME_XWGT_ACCOUNT_ID);
+    return this.findByName(HOME_XWGT_ACCOUNT_NAME);
   }
 
   async getNanoHomeAccount(): Promise<AccountEntity> {
-    return this.findById(HOME_NANO_ACCOUNT_ID);
+    return this.findByName(HOME_NANO_ACCOUNT_NAME);
   }
 
   async getBananoHomeAccount(): Promise<AccountEntity> {
-    return this.findById(HOME_BANANO_ACCOUNT_ID);
+    return this.findById(HOME_BANANO_ACCOUNT_NAME);
   }
 
 
@@ -85,41 +86,59 @@ export class AccountService {
 
   async create(account: CreateAccountProps): Promise<AccountEntity> {
 
+    if(!account.uid || account.uid === "" || account.uid === null) account.uid = uuid();
+     
     this.logger.debug("creating account:" + JSON.stringify(account));
     let accountEntity:AccountEntity = await this.accountRepo.create<AccountEntity>({...account});
     
     return accountEntity;
   }
 
-  async update(id:number,account: UpdateAccountProps): Promise<AccountEntity> {
+  async update(uid:string,account: UpdateAccountProps): Promise<AccountEntity> {
 
     this.logger.debug("updating account:" + JSON.stringify(account));
-    let result = await this.accountRepo.update<AccountEntity>({...account}, { where: { id } });
+    let result = await this.accountRepo.update<AccountEntity>({...account}, { where: { uid } });
 
     if(result[0]> 0) {
-      return new AccountEntity({id: id, ...account});
+      return new AccountEntity({...account});
     }
     else{
-      throw new Error(`Account could not be found by id:${id}. No record updated`);
+      throw new Error(`Account could not be found by uid:${uid}. No record updated`);
     }
   }
 
-  async findAll(id: number | null, name: string | null): Promise<AccountEntity[]> {
+  async findAll(uid: number | null, name: string | null): Promise<AccountEntity[]> {
     let accountEntities: AccountEntity[] = await (await this.accountRepo.findAll<AccountEntity>());
     return accountEntities;
   }
 
-  async findById(id: number): Promise<AccountEntity> {
+  async findById(uid: string): Promise<AccountEntity> {
     // TODO: validate method params
-    this.logger.debug(`finding account in the datastore by id[${id}]`);
-    let account: AccountEntity | null = await this.accountRepo.findByPk<AccountEntity>(id);
+    this.logger.debug(`finding account in the datastore by uid[${uid}]`);
+    let account: AccountEntity | null = await this.accountRepo.findByPk<AccountEntity>(uid);
 
     if (account) {
-      this.logger.debug(`found account[${JSON.stringify(account)}] in the datastore by id[${id}]`);
+      this.logger.debug(`found account[${JSON.stringify(account)}] in the datastore by uid[${uid}]`);
     }
     else {
-      this.logger.debug(`could not find any account record in the datastore by id[${id}]`);
-      throw new Error(`Account could not be found by id:${id}`);
+      this.logger.debug(`could not find any account record in the datastore by uid[${uid}]`);
+      throw new Error(`Account could not be found by uid:${uid}`);
+    }
+
+    return account;
+  }
+
+  async findByName(name: string): Promise<AccountEntity> {
+    // TODO: validate method params
+    this.logger.debug(`finding account in the datastore by name[${name}]`);
+    let account: AccountEntity | null = await this.accountRepo.findOne({where : {name}})
+
+    if (account) {
+      this.logger.debug(`found account[${JSON.stringify(account)}] in the datastore by name[${name}]`);
+    }
+    else {
+      this.logger.debug(`could not find any account record in the datastore by name[${name}]`);
+      throw new Error(`Account could not be found by name:${name}`);
     }
 
     return account;
@@ -158,13 +177,13 @@ export class AccountService {
   }
 
   /**
-   * Sets deleted column to true (soft-delete) for entity by the given id
-   * @param id 
+   * Sets deleted column to true (soft-delete) for entity by the given uid
+   * @param uid 
    * @returns AccountEntity
    */
-   async delete(id: number): Promise<void> {
+   async delete(uid: string): Promise<void> {
    
-    let accountEntity: AccountEntity  = await this.findById(id);
+    let accountEntity: AccountEntity  = await this.findById(uid);
     
     try {
       await accountEntity.destroy();

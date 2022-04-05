@@ -1,0 +1,1 @@
+INSERT INTO `ACCOUNT` (`name`,`description`,`userId`,`assetId`,`balance`,`enabled`,`deleted`) VALUES (?,?,?,?,?,?,?,?);

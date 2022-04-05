@@ -1,10 +1,12 @@
 import sequelize from 'sequelize';
-import { Column, Model, Table } from 'sequelize-typescript';
+import { Column, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { STRING} from 'sequelize/types';
 
 
 export interface CreateGameLoungeUserProps {
+    uid?: string;
     userId: number;
-    gameLoungeId: number;
+    gameLoungeId: string;
     roleId: number;
 }
 
@@ -19,11 +21,15 @@ export interface GameLoungeUserProps extends UpdateGameLoungeUserProps {
 @Table({ tableName: "GAME_LOUNGE_USER", version: true, timestamps: true, paranoid:false, omitNull: true})
 export class GameLoungeUserEntity extends Model {
 
+    @PrimaryKey
+    @Column({allowNull:false})
+    uid!: string;
+
     @Column({allowNull:false, unique:"playerGl"})
     userId!: number;
 
     @Column({allowNull:false, unique:"playerGl"})
-    gameLoungeId!: number;
+    gameLoungeId!: string;
 
     @Column({allowNull:false})
     roleId!: number;

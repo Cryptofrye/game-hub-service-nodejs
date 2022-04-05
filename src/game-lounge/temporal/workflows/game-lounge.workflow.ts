@@ -1,7 +1,7 @@
 import * as wf from "@temporalio/workflow";
 import { CreateGameLoungeUserProps, GameLoungeUserEntity } from "src/game-lounge/entities/game-lounge-user.entity";
 
-import { CreateGameLoungeProps } from "src/game-lounge/entities/game-lounge.entity";
+import { CreateGameLoungeProps, GameLoungeEntity } from "src/game-lounge/entities/game-lounge.entity";
 import { GameLoungeActivityFactory } from "../activities/game-lounge.activities";
 import { addUserFlow } from "./game-lounge-add-user-workflow";
 
@@ -22,9 +22,7 @@ export const { createGameLounge, addUser, removeUser, startGame, processGameResu
 
 export async function gameLoungeFlow(gameLoungeProps: CreateGameLoungeProps): Promise<void> {
 
-
-
-    //let gameLounge:GameLoungeEntity;
+    let gameLounge:GameLoungeEntity;
     
     let isGameStarted:boolean = false;
     let isGameFinised:boolean = false;
@@ -33,7 +31,7 @@ export async function gameLoungeFlow(gameLoungeProps: CreateGameLoungeProps): Pr
     console.log('game start timer set for: ' + new Date(target).toString());
 
     wf.setHandler(addUserSignal, async (gameLoungeUser: CreateGameLoungeUserProps):Promise<void> => { 
-            gameLoungeUser.gameLoungeId = 3;
+            //gameLoungeUser.gameLoungeId = 3;
             let result:GameLoungeUserEntity = await addUser(gameLoungeUser);
             console.log(`gameLoungeFlow:add user result:${result}`);
         }
@@ -53,7 +51,7 @@ export async function gameLoungeFlow(gameLoungeProps: CreateGameLoungeProps): Pr
     wf.setHandler(timeLeftQuery, () => timer.deadline - Date.now());
 
     console.log(`running wokflow gameLoungeFlow with params:${JSON.stringify(gameLoungeProps)}`);
-    await createGameLounge(gameLoungeProps);   
+    gameLounge = await createGameLounge(gameLoungeProps);   
     await timer; // if you send in a signal with a new time, this timer will resolve earlier!
 
     await startGame();

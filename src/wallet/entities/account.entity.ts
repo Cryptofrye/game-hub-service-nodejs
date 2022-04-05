@@ -1,7 +1,8 @@
-import { Column, Model, Table } from 'sequelize-typescript';
+import { Column, Model, PrimaryKey, Table } from 'sequelize-typescript';
 
 
 export interface CreateAccountProps {
+    uid?: string;
     name: string;
     description: string;
     userId: number;
@@ -23,6 +24,10 @@ export interface AccountProps extends UpdateAccountProps {
 
 @Table({ tableName: "ACCOUNT", version: true, timestamps: true, paranoid:true ,deletedAt: true, omitNull: true })
 export class AccountEntity extends Model {
+
+    @PrimaryKey
+    @Column({allowNull:false})
+    uid!: string;
 
     @Column({allowNull:false})
     name!: string;

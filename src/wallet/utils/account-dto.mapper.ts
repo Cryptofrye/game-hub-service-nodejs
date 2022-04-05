@@ -1,12 +1,14 @@
+import { AccountCreateDto } from "../dtos/account-create.dto";
+import { AccountUpdateDto } from "../dtos/account-update.dto";
 import { AccountDto } from "../dtos/account.dto";
-import { AccountEntity } from "../entities/account.entity";
+import { AccountEntity, CreateAccountProps, UpdateAccountProps } from "../entities/account.entity";
 
 export class AccountDtoMapper {
 
     public static toAccountDto(accountEntity: AccountEntity) : AccountDto {
 
         let dto: AccountDto = {
-            id: accountEntity.id,
+            uid: accountEntity.uid,
             name: accountEntity.name,
             userId: accountEntity.userId,
             assetId: accountEntity.assetId,
@@ -31,4 +33,38 @@ export class AccountDtoMapper {
 
         return dtos;
     }
+
+    public static toCreateAccountProps(dto: AccountCreateDto) : CreateAccountProps {
+
+        let props: CreateAccountProps = {
+            name: dto.name,
+            description: dto.description,
+            userId: dto.userId,
+            assetId: dto.assetId,
+            balance: dto.balance,
+            enabled: dto.enabled,
+            deleted: false
+        }
+
+        return props;
+    }
+
+    public static toUpdateAccountProps(uid:string, dto: AccountUpdateDto) : CreateAccountProps {
+
+        let props: UpdateAccountProps = {
+            uid: uid,
+            name: dto.name,
+            description: dto.description,
+            userId: dto.userId,
+            assetId: dto.assetId,
+            balance: dto.balance,
+            enabled: dto.enabled,
+            deleted: false
+        }
+
+        return props;
+
+    }
+
+
 }

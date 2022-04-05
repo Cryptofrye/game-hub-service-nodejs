@@ -12,7 +12,7 @@ export class GLDtoMapper {
 
     public static toGameLoungeUserDto(glUserEntity:GameLoungeUserEntity): GameLoungeUserDto {
         let dto: GameLoungeUserDto = {
-            id : glUserEntity.id,
+            uid : glUserEntity.uid,
             gameLoungeId: glUserEntity.gameLoungeId,
             user: fundGameHubUserById(glUserEntity.userId)
         }
@@ -33,7 +33,7 @@ export class GLDtoMapper {
     public static toGameLoungeDto(gl:GameLoungeEntity):GameLoungeDto {
 
         let glDto: GameLoungeDto = {
-            id: gl.id,
+            uid: gl.uid,
             asset: findAssetById(gl.assetId),
             state: findGameLoungeBySate(gl.state)!,
             type: findGameLoungeTypeId(gl.type)!,

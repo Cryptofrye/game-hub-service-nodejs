@@ -1,0 +1,59 @@
+[
+    {
+        "name": "xwgt_home_account",
+        "description": "the home account to manage xwgt token",
+        "userId": 1,
+        "assetId": 1,
+        "balance": 15000,
+        "enabled": true
+    },
+    {
+        "name": "nano_home_account",
+        "description": "the home account to manage nano token",
+        "userId": 1,
+        "assetId": 2,
+        "balance": 15000,
+        "enabled": true
+    },
+    {
+        "name": "banano_home_account",
+        "description": "the home account to manage banano token",
+        "userId": 1,
+        "assetId": 3,
+        "balance": 15000,
+        "enabled": true
+    },
+    {
+        "name": "XWGT Account",
+        "description": "the home account to manage xwgt token",
+        "userId": 2,
+        "assetId": 1,
+        "balance": 15000,
+        "enabled": true
+    },
+    {
+        "name": "Nano Account",
+        "description": "the home account to manage Nano token",
+        "userId": 2,
+        "assetId": 2,
+        "balance": 15000,
+        "enabled": true
+    },
+    {
+        "name": "XWGT Account",
+        "description": "the home account to manage XWGT token",
+        "userId": 3,
+        "assetId": 1,
+        "balance": 15000,
+        "enabled": true
+    },
+    {
+        "name": "Nano Account",
+        "description": "the home account to manage Nano token",
+        "userId": 3,
+        "assetId": 2,
+        "balance": 15000,
+        "enabled": true
+    }
+
+]

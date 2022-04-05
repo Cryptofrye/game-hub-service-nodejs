@@ -12,7 +12,7 @@ export const ActivityFactory = (accountService: AccountService) => ({
     getAccounts: async (): Promise<AccountEntity[]> => {
         return await accountService.findAll(null, null);
     },
-    findById: async (id: number): Promise<AccountEntity> => {
+    findById: async (id: string): Promise<AccountEntity> => {
         return await accountService.findById(id);
     },
     createGameLounge: async ()  => {

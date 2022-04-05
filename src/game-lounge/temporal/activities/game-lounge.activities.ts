@@ -29,9 +29,8 @@ export const GameLoungeActivityFactory = (gameLoungeService: GameLoungeService, 
     processGameResult: async (): Promise<void> => {
         console.log(`${GameLoungeActivityFactory.name}: processGameResult activity`);
     },
-    closeGameLaounge: async (): Promise<GameLoungeEntity> => {
+    closeGameLaounge: async (): Promise<void> => {
         console.log(`${GameLoungeActivityFactory.name}: closeGameLaounge activity`);
-        return await gameLoungeService.findById(1);
     },
 });
 

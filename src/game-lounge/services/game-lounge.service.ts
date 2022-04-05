@@ -37,7 +37,7 @@ export class GameLoungeService {
   async addPlayer(glUserCreateProps: CreateGameLoungeUserProps): Promise<GameLoungeUserEntity> {
     
     let userId:number = glUserCreateProps.userId;
-    let gameLoungeId:number = glUserCreateProps.gameLoungeId;
+    let gameLoungeId:string = glUserCreateProps.gameLoungeId;
 
     let gameLounge: GameLoungeEntity = await this.findById(gameLoungeId);
 
@@ -72,6 +72,11 @@ export class GameLoungeService {
         glUSer = await this.gameLoungeUserEntity.create({...glUserCreateProps},
             transactionHost
         );
+
+        gameLounge.prize = gameLounge.prize + gameLounge.fee;
+        await GameLoungeEntity.update({prize:gameLounge.prize} , {where : {uid:gameLounge.uid, },transaction: t})
+        //await gameLounge.update(gameLounge.prize, transactionHost);
+
       });
     } catch (err) {
       this.logger.error(`Could not add user:${userId} to game lounge:${gameLoungeId}. error:${err}`);
@@ -92,45 +97,45 @@ export class GameLoungeService {
     return gl;
   }
 
-  async update(id:number,gameLounge: UpdateGameLoungeProps): Promise<GameLoungeEntity> {
+  async update(uid:string,gameLounge: UpdateGameLoungeProps): Promise<GameLoungeEntity> {
 
     this.logger.debug("updating game lounge:" + JSON.stringify(gameLounge));
-    let gle:GameLoungeEntity = await this.gameLoungeRepo.update(id,gameLounge);
+    let gle:GameLoungeEntity = await this.gameLoungeRepo.update(uid,gameLounge);
     return gle;
   }
 
   /**
    * Finds all entitis in the datastore
    * 
-   * @param id 
+   * @param uid 
    * @param name 
    * @returns array of GamingLounge entities
    */
-  async findAll(id: number | null, name: string | null): Promise<GameLoungeEntity[]> {
-    let gamingLounges: GameLoungeEntity[] = await this.gameLoungeRepo.findAll(id,name);
+  async findAll(uid: string | null, name: string | null): Promise<GameLoungeEntity[]> {
+    let gamingLounges: GameLoungeEntity[] = await this.gameLoungeRepo.findAll(uid,name);
     return gamingLounges;
   }
 
   /**
-   * Finds entity by the given id
+   * Finds entity by the given uid
    * 
-   * @param id 
+   * @param uid 
    * @returns GamingLounge
    */
-  async findById(id: number): Promise<GameLoungeEntity> {
+  async findById(uid: string): Promise<GameLoungeEntity> {
     // TODO: validate method params
-    let gameLounge: GameLoungeEntity = await this.gameLoungeRepo.findById(id);
+    let gameLounge: GameLoungeEntity = await this.gameLoungeRepo.findById(uid);
     return gameLounge;
   }
 
   /**
-   * Sets deleted column to true (soft-delete) for entity by the given id
-   * @param id 
+   * Sets deleted column to true (soft-delete) for entity by the given uid
+   * @param uid 
    * @returns GamingLounge
    */
-  async delete(id: number): Promise<void> {
+  async delete(uid: string): Promise<void> {
    
-    let gameLounge: GameLoungeEntity  = await this.findById(id);
+    let gameLounge: GameLoungeEntity  = await this.findById(uid);
     
     try {
       await gameLounge.destroy();
@@ -156,7 +161,7 @@ export class GameLoungeService {
     return GAME_LOUNGE_STATE_LIST;
   }
 
-  async findAllGlPlayers(gameLoungeId: number): Promise<GameLoungeUserEntity[]> {
+  async findAllGlPlayers(gameLoungeId: string): Promise<GameLoungeUserEntity[]> {
     let glPlayers: GameLoungeUserEntity[] = await this.gameLoungeRepo.findAllGlPlayers(gameLoungeId);
     return glPlayers;
   }

@@ -5,7 +5,7 @@ import { GameLoungeType } from "../../common/constants/game-lounge-type";
 
 export class GameLoungeDto {
 
-    id!: number;
+    uid!: string;
     type!: GameLoungeType;
     state!: GameLoungeState;
     game!: Game;

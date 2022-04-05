@@ -4,6 +4,7 @@ import { Connection, WorkflowClient } from '@temporalio/client';
 import { AccountEntity, CreateAccountProps } from 'src/wallet/entities/account.entity';
 import { WorkerConfigFactory } from './worker-config.factory';
 import { createAccountFlow } from './workflows/account.workflow';
+import { v4 as uuid } from 'uuid';
 
 
 //@Injectable()
@@ -34,12 +35,13 @@ export class WalletTemporalClient implements OnApplicationShutdown {
 
   async run(account: CreateAccountProps):Promise<AccountEntity[]> {
 
+    if(account.uid) account.uid = uuid();
 
     const handle = await this.client.start(createAccountFlow, {
       args: [account], // type inference works! args: [name: string]
       taskQueue: this.configFactory.baseConfig.taskQueue,
-      // in practice, use a meaningful business id, eg customerId or transactionId
-      workflowId: 'wf-id-' + Math.floor(Math.random() * 1000),
+      // in practice, use a meaningful business uid, eg customerId or transactionId
+      workflowId: 'wf-uid-' + Math.floor(Math.random() * 1000),
     });
     console.log(`Started workflow ${handle.workflowId}`);
   

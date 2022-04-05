@@ -30,7 +30,7 @@ export class TemporalController {
   async addUser(@Param('workFlowId') workFlowId: string,@Body(/*new ValidationPipe(VALIDATION_SCHEMA_GAMING_LOUNGE_CREATE)*/) gameLoungeUserAddDto: GameLoungeUserAddDto): Promise<void> {
     console.log(`sending signal to  temporal workflow:${workFlowId}`)
     const handle = await this.gameLoungeTemporalClient.client.getHandle(workFlowId);
-    await handle.signal(addUserSignal,{gameLoungeId:-1, ...gameLoungeUserAddDto});
+    await handle.signal(addUserSignal,{...gameLoungeUserAddDto,gameLoungeId:workFlowId});
   }
 
   @ApiOperation({ summary: 'Send Game Finished signal to  temporal flow' })

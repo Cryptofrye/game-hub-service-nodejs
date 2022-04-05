@@ -20,7 +20,7 @@ export const findAssetById = (id:number):Asset => {
         case ASSET_BANANO.id:
             return ASSET_BANANO;      
         default:
-            throw Error(`asset not found by id:${id}`);
+            throw Error(`asset not found by uid:${id}`);
     }
 };
 

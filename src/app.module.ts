@@ -11,6 +11,9 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ErrorsInterceptor } from '@wodo-platform/wg-shared-lib/dist/wodogaming/error/errors.interceptor';
 import { LoggerModule } from 'nestjs-pino';
 import { WalletModule } from './wallet/wallet.module';
+import { GameLoungeEntity } from './game-lounge/entities/game-lounge.entity';
+import { GameLoungeUserEntity } from './game-lounge/entities/game-lounge-user.entity';
+import { AccountEntity } from './wallet/entities/account.entity';
 
 @Module({
   imports: [
@@ -47,7 +50,9 @@ import { WalletModule } from './wallet/wallet.module';
       database: String(process.env.MYSQLDB_WODO_DATABASE).toString(),
       autoLoadModels: true,
       synchronize: true,
-      logging: console.log
+      logging: console.log, 
+      //sync:{force:true}  
+
     }),
    // NotificationModule,
     //GameServerModule,

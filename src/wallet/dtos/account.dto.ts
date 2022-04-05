@@ -1,5 +1,5 @@
 export class AccountDto {
-    id!: number
+    uid!: string
     name!: string;
     description!: string;
     userId!: number;
